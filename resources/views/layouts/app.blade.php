@@ -19,7 +19,7 @@
     @include('layouts.partials.breadcrumb')
 
     {{-- Page Content --}}
-    <div class="page-content pt-0">
+    <div class="page-content pt-5">
 
         {{-- Sidebar --}}
         @include('layouts.partials.sidebar')

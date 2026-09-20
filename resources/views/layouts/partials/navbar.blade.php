@@ -1,5 +1,5 @@
 <!-- Main navbar -->
-<div class="navbar navbar-dark navbar-expand-lg navbar-static mb-3">
+<div class="navbar navbar-dark navbar-expand-lg fixed-top mb-3">
     <div class="container-fluid">
         <div class="d-flex d-lg-none me-2">
             <button type="button" class="navbar-toggler sidebar-mobile-main-toggle rounded-pill">
