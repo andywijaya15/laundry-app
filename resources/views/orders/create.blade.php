@@ -62,7 +62,7 @@
                                     <option value="">Pilih layanan</option>
                                     @foreach($services as $service)
                                         <option value="{{ $service->id }}" data-price="{{ $service->price }}" data-unit="{{ $service->unit }}">
-                                            {{ $service->name }} ({{ $service->unit === 'kg' ? 'Rp '.number_format($service->price,0,',','.') : 'Rp '.number_format($service->price,0,',','.'/item) }})
+                                            {{ $service->name }} ({{ $service->unit === 'kg' ? 'Rp '.number_format($service->price,0,',','.').'/kg' : 'Rp '.number_format($service->price,0,',','.').'/item' }})
                                         </option>
                                     @endforeach
                                 </select>
