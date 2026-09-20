@@ -1,9 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="ltr">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Dashboard') - Laundry App</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>@yield('title', 'App') - Laundry App</title>
 
     <link href="{{ asset('assets/fonts/inter/inter.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/icons/phosphor/styles.min.css') }}" rel="stylesheet">
@@ -12,31 +13,15 @@
 </head>
 <body>
 
-    {{-- Navbar --}}
-    @include('layouts.partials.navbar')
+    @include('layouts.partials.auth-navbar')
 
-    {{-- Breadcrumb --}}
-    @include('layouts.partials.breadcrumb')
-
-    {{-- Page Content --}}
-    <div class="page-content pt-0">
-
-        {{-- Sidebar --}}
-        @include('layouts.partials.sidebar')
-
-        {{-- Main Content --}}
+    <div class="page-content">
         <div class="content-wrapper">
-            <div class="content">
-                @yield('content')
-            </div>
+            @yield('content')
         </div>
-
     </div>
 
     @include('layouts.partials.footer')
-
-    {{-- Notifications Offcanvas --}}
-    @include('layouts.partials.notifications')
 
     <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/app.js') }}"></script>

@@ -1,44 +1,47 @@
-@extends('layouts.app')
+@extends('layouts.auth')
+
+@section('title', 'Lupa Password')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Reset Password') }}</div>
+<div class="content d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 200px);">
+    <div class="login-form w-100" style="max-width: 420px;">
+        <div class="card mb-0 shadow-sm">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-primary-light rounded-circle mb-3" style="width: 72px; height: 72px;">
+                        <i class="ph-lock-key text-primary" style="font-size: 2rem;"></i>
+                    </div>
+                    <h4 class="mb-1">Reset Password</h4>
+                    <p class="text-muted mb-0">Masukkan email untuk menerima link reset</p>
+                </div>
 
-                <div class="card-body">
-                    @if (session('status'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
-                    @endif
+                @if (session('status'))
+                    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                        {{ session('status') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
 
-                    <form method="POST" action="{{ route('password.email') }}">
-                        @csrf
+                <form method="POST" action="{{ route('password.email') }}">
+                    @csrf
 
-                        <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus placeholder="Masukkan email">
+                        @error('email')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
 
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="ph-paper-plane me-2"></i>Kirim Link Reset
+                        </button>
+                    </div>
+                </form>
 
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Send Password Reset Link') }}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
+                <div class="text-center mt-4">
+                    <a href="{{ route('login') }}" class="text-decoration-none"><i class="ph-arrow-left me-1"></i>Kembali ke Login</a>
                 </div>
             </div>
         </div>
