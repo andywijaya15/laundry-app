@@ -39,10 +39,23 @@ class PaymentController extends Controller
                 now()->addDays(7),
                 ['order' => $order->id]
             );
+            $order->whatsapp_share_url = $this->generateWhatsAppShareUrl($order);
             return $order;
         });
 
         return view('payments.index', compact('orders'));
+    }
+
+    protected function generateWhatsAppShareUrl(Order $order): string
+    {
+        $message = "🧺 *NOTA LAUNDRY*\n\n"
+            . "Kode: {$order->order_code}\n"
+            . "Pelanggan: {$order->customer->name}\n"
+            . "Total: Rp " . number_format($order->total_price, 0, ',', '.') . "\n"
+            . "Status: {$order->getPaymentStatusLabel()}\n\n"
+            . "Detail: {$order->nota_url}";
+
+        return 'https://wa.me/?text=' . urlencode($message);
     }
 
     public function create(Order $order)

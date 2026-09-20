@@ -50,6 +50,7 @@ class OrderController extends Controller
                 now()->addDays(7),
                 ['order' => $order->id]
             );
+            $order->whatsapp_share_url = $this->generateWhatsAppShareUrl($order);
             return $order;
         });
 
@@ -195,6 +196,18 @@ class OrderController extends Controller
 
         return redirect()->route('orders.show', $order)
             ->with('success', 'Item order berhasil diperbarui.');
+    }
+
+    protected function generateWhatsAppShareUrl(Order $order): string
+    {
+        $message = "🧺 *NOTA LAUNDRY*\n\n"
+            . "Kode: {$order->order_code}\n"
+            . "Pelanggan: {$order->customer->name}\n"
+            . "Total: Rp " . number_format($order->total_price, 0, ',', '.') . "\n"
+            . "Status: {$order->getPaymentStatusLabel()}\n\n"
+            . "Detail: {$order->nota_url}";
+
+        return 'https://wa.me/?text=' . urlencode($message);
     }
 
     public function nota(Request $request, Order $order)

@@ -7,28 +7,8 @@
     <link href="{{ asset('assets/fonts/inter/inter.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/icons/phosphor/styles.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/ltr/all.min.css') }}" rel="stylesheet">
-    <style>
-        @media print {
-            body {
-                background: white;
-            }
-            .no-print {
-                display: none;
-            }
-        }
-    </style>
 </head>
 <body class="bg-light p-4">
-    <div class="no-print mb-3 text-center">
-        <a
-            href="https://wa.me/?text={{ urlencode(url()->full()) }}"
-            target="_blank"
-            class="btn btn-success w-100 fw-medium py-3"
-        >
-            <i class="ph-whatsapp-logo me-1"></i> Bagikan via WhatsApp
-        </a>
-    </div>
-
     <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-5">
         <div class="text-center border-bottom pb-4 mb-4">
             <h1 class="h4 fw-bold text-dark">Laundry</h1>

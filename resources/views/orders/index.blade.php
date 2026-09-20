@@ -115,7 +115,7 @@
                                             <a href="{{ route('orders.show', $order) }}" class="btn btn-sm btn-light" title="Lihat Detail">
                                                 <i class="ph-eye"></i>
                                             </a>
-                                            <a href="https://wa.me/?text={{ urlencode('🧺 *NOTA LAUNDRY*%0A%0AKode: ' . $order->order_code . '%0APelanggan: ' . $order->customer->name . '%0ATotal: Rp ' . number_format($order->total_price, 0, ',', '.') . '%0AStatus: ' . $order->getPaymentStatusLabel() . '%0A%0ADetail: ' . $order->nota_url) }}" target="_blank" class="btn btn-sm btn-success" title="Bagikan Nota via WhatsApp">
+                                            <a href="{{ $order->whatsapp_share_url }}" target="_blank" class="btn btn-sm btn-success" title="Bagikan Nota via WhatsApp">
                                                 <i class="ph-whatsapp-logo"></i>
                                             </a>
                                         </div>
