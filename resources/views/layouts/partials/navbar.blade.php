@@ -23,11 +23,6 @@
                 </a>
 
                 <div class="dropdown-menu dropdown-menu-end">
-                    <a href="{{ route('profile.index') }}" class="dropdown-item">
-                        <i class="ph-user-circle me-2"></i>
-                        My Profile
-                    </a>
-                    <div class="dropdown-divider"></div>
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
                         <button type="submit" class="dropdown-item">
