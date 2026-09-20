@@ -21,22 +21,23 @@
 
         <div class="card mb-3">
             <div class="card-body p-3">
-                <form method="GET" action="{{ route('payments.index') }}" class="row g-3 align-items-end">
-                    <div class="col-12 col-md-3">
+                <form method="GET" action="{{ route('payments.index') }}" class="row g-3">
+                    <div class="col-12 col-sm-6 col-md-3">
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari kode order atau nama..."
                                class="form-control form-control-sm">
                     </div>
-                    <div class="col-12 col-md-2">
+                    <div class="col-12 col-sm-3 col-md-2">
                         <input type="date" name="date_from" value="{{ request('date_from') }}" placeholder="Dari"
                                class="form-control form-control-sm">
                     </div>
-                    <div class="col-12 col-md-2">
+                    <div class="col-12 col-sm-3 col-md-2">
                         <input type="date" name="date_to" value="{{ request('date_to') }}" placeholder="Sampai"
                                class="form-control form-control-sm">
                     </div>
-                    <div class="col-12 col-md-1">
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="ph-magnifying-glass me-1"></i> Filter
+                    <div class="col-12 col-sm-2 col-md-1">
+                        <button type="submit" class="btn btn-primary w-100 d-flex justify-content-center">
+                            <i class="ph-magnifying-glass me-1 d-none d-sm-inline"></i>
+                            <span class="d-sm-none d-md-inline">Filter</span>
                         </button>
                     </div>
                 </form>

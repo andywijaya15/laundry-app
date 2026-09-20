@@ -8,7 +8,7 @@
             <div class="card-body">
                 <div class="d-flex align-items-center">
                     <div class="w-40px h-40px rounded-circle bg-primary-light d-flex align-items-center justify-content-center me-3">
-                        <i class="ph-currency-circle text-primary fs-3"></i>
+                        <i class="ph-coins text-primary fs-3"></i>
                     </div>
                     <div>
                         <p class="text-muted mb-1">Omzet Hari Ini</p>

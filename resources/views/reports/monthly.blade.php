@@ -27,24 +27,26 @@
                 <h4 class="mb-0">Rp {{ number_format($totalYear, 0, ',', '.') }}</h4>
             </div>
         </div>
-        <div class="col-12 col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <p class="text-muted mb-1">Total Order</p>
-                    <h4 class="mb-0">{{ $totalOrders }}</h4>
-                </div>
-            </div>
-            <div class="col-12 col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <p class="text-muted mb-1">Rata-rata / Bulan</p>
-                        <h4 class="mb-0">Rp {{ number_format($totalOrders ? $totalYear / $totalOrders : 0, 0, ',', '.') }}</h4>
-                    </div>
-                </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <p class="text-muted mb-1">Total Order</p>
+                <h4 class="mb-0">{{ $totalOrders }}</h4>
             </div>
         </div>
-
+    </div>
+    <div class="col-12 col-md-4">
         <div class="card">
+            <div class="card-body">
+                <p class="text-muted mb-1">Rata-rata / Bulan</p>
+                <h4 class="mb-0">Rp {{ number_format($totalOrders ? $totalYear / $totalOrders : 0, 0, ',', '.') }}</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
             <div class="card-body p-0">
                 <table class="table table-hover mb-0">
                     <thead class="table-light">
