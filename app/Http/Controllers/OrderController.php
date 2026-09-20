@@ -45,12 +45,13 @@ class OrderController extends Controller
         $orders = $query->latest()->paginate(15)->withQueryString();
 
         $orders->getCollection()->transform(function ($order) {
-            $order->nota_url = URL::temporarySignedRoute(
+            $notaUrl = URL::temporarySignedRoute(
                 'orders.nota',
                 now()->addDays(7),
                 ['order' => $order->id]
             );
-            $order->whatsapp_share_url = $this->generateWhatsAppShareUrl($order);
+            $order->nota_url = $notaUrl;
+            $order->whatsapp_share_url = $this->generateWhatsAppShareUrl($order, $notaUrl);
             return $order;
         });
 
@@ -198,16 +199,26 @@ class OrderController extends Controller
             ->with('success', 'Item order berhasil diperbarui.');
     }
 
-    protected function generateWhatsAppShareUrl(Order $order): string
+    protected function generateWhatsAppShareUrl(Order $order, string $notaUrl): string
     {
-        $message = "🧺 *NOTA LAUNDRY*\n\n"
-            . "Kode: {$order->order_code}\n"
-            . "Pelanggan: {$order->customer->name}\n"
-            . "Total: Rp " . number_format($order->total_price, 0, ',', '.') . "\n"
-            . "Status: {$order->getPaymentStatusLabel()}\n\n"
-            . "Detail: {$order->nota_url}";
+        try {
+            $customerName = $order->customer?->name ?? 'Pelanggan';
+            
+            $message = "NOTA LAUNDRY\n\n"
+                . "Kode: {$order->order_code}\n"
+                . "Pelanggan: {$customerName}\n"
+                . "Total: Rp " . number_format($order->total_price, 0, ',', '.') . "\n"
+                . "Status: {$order->getPaymentStatusLabel()}\n\n"
+                . "Detail: {$notaUrl}";
 
-        return 'https://wa.me/?text=' . urlencode($message);
+            return 'https://wa.me/?text=' . urlencode($message);
+        } catch (\Exception $e) {
+            \Log::error('Failed to generate WhatsApp share URL', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage()
+            ]);
+            return 'https://wa.me/?text=' . urlencode($notaUrl);
+        }
     }
 
     public function nota(Request $request, Order $order)
