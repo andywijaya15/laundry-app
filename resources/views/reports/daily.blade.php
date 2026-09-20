@@ -1,72 +1,93 @@
 @extends('layouts.app')
+@section('title', 'Laporan Harian')
+@section('breadcrumb', 'Laporan Harian')
 
 @section('content')
-<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">Laporan Harian</h1>
-    </div>
-
-    <div class="bg-white shadow rounded-lg p-6 mb-6">
-        <form method="GET" action="{{ route('reports.daily') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Dari Tanggal</label>
-                <input type="date" name="date_from" value="{{ $dateFrom->format('Y-m-d') }}"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-3">
+            <div class="card-body">
+                <form method="GET" action="{{ route('reports.daily') }}" class="row g-3">
+                    <div class="col-12 col-md-3">
+                        <label class="form-label">Dari Tanggal</label>
+                        <input type="date" name="date_from" value="{{ $dateFrom->format('Y-m-d') }}"
+                               class="form-control">
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <label class="form-label">Sampai Tanggal</label>
+                        <input type="date" name="date_to" value="{{ $dateTo->format('Y-m-d') }}"
+                               class="form-control">
+                    </div>
+                    <div class="col-12 col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Filter</button>
+                    </div>
+                    <div class="col-12 col-md-3 d-flex align-items-end">
+                        <a href="{{ route('reports.daily') }}" class="btn btn-light w-100">Reset</a>
+                    </div>
+                </form>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Sampai Tanggal</label>
-                <input type="date" name="date_to" value="{{ $dateTo->format('Y-m-d') }}"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-12 col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="text-muted mb-1">Total Omzet</p>
+                        <h4 class="mb-0">Rp {{ number_format($dailyData->sum('total'), 0, ',', '.') }}</h4>
+                    </div>
+                </div>
             </div>
-            <div class="md:col-span-2 flex items-end space-x-3">
-                <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Filter</button>
-                <a href="{{ route('reports.daily') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Reset</a>
+            <div class="col-12 col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="text-muted mb-1">Total Transaksi</p>
+                        <h4 class="mb-0">{{ $dailyData->sum('count') }}</h4>
+                    </div>
+                </div>
             </div>
-        </form>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div class="bg-white shadow rounded-lg p-6">
-            <p class="text-sm text-gray-500">Total Omzet</p>
-            <p class="text-2xl font-bold text-gray-900">Rp {{ number_format($dailyData->sum('total'), 0, ',', '.') }}</p>
+            <div class="col-12 col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="text-muted mb-1">Rata-rata / Hari</p>
+                        <h4 class="mb-0">Rp {{ number_format($dailyData->count() ? $dailyData->sum('total') / $dailyData->count() : 0, 0, ',', '.') }}</h4>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="bg-white shadow rounded-lg p-6">
-            <p class="text-sm text-gray-500">Total Transaksi</p>
-            <p class="text-2xl font-bold text-gray-900">{{ $dailyData->sum('count') }}</p>
-        </div>
-        <div class="bg-white shadow rounded-lg p-6">
-            <p class="text-sm text-gray-500">Rata-rata / Hari</p>
-            <p class="text-2xl font-bold text-gray-900">Rp {{ number_format($dailyData->count() ? $dailyData->sum('total') / $dailyData->count() : 0, 0, ',', '.') }}</p>
-        </div>
-    </div>
 
-    <div class="bg-white shadow rounded-lg overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Omzet</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jumlah Transaksi</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                @forelse ($dailyData as $data)
-                    <tr>
-                        <td class="px-6 py-4 text-sm text-gray-900">{{ \Carbon\Carbon::parse($data->date)->format('d/m/Y') }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-900">Rp {{ number_format($data->total, 0, ',', '.') }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-500">{{ $data->count }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="3" class="px-6 py-12 text-center text-gray-500">Tidak ada data.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-    <div class="mt-4">
-        {{ $payments->links() }}
+        <div class="card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Omzet</th>
+                                <th>Jumlah Transaksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($dailyData as $data)
+                                <tr>
+                                    <td>{{ \Carbon\Carbon::parse($data->date)->format('d/m/Y') }}</td>
+                                    <td>Rp {{ number_format($data->total, 0, ',', '.') }}</td>
+                                    <td class="text-muted">{{ $data->count }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-4">Tidak ada data.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                @if($payments->hasPages())
+                    <div class="card-footer">
+                        {{ $payments->links() }}
+                    </div>
+                @endif
+            </div>
+        </div>
     </div>
 </div>
 @endsection

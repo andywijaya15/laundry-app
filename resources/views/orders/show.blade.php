@@ -1,198 +1,208 @@
 @extends('layouts.app')
+@section('title', 'Detail Order')
+@section('breadcrumb', 'Detail Order')
 
 @section('content')
-<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-    <div class="mb-6">
-        <a href="{{ route('orders.index') }}" class="text-indigo-600 hover:text-indigo-900 text-sm">&larr; Kembali</a>
-        <h1 class="text-2xl font-bold text-gray-900 mt-2">Detail Order</h1>
+<div class="row">
+    <div class="col-12">
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <a href="{{ route('orders.index') }}" class="btn btn-light btn-sm">
+                <i class="ph-arrow-left me-1"></i> Kembali
+            </a>
+            <h4 class="mb-0">Detail Order</h4>
+        </div>
     </div>
+</div>
 
-    @if (session('success'))
-        <div class="mb-4 bg-green-50 text-green-700 px-4 py-3 rounded-md">{{ session('success') }}</div>
-    @endif
+@php
+    $statusColors = [
+        'diterima' => 'bg-info-light text-info',
+        'cuci' => 'bg-warning-light text-warning',
+        'setrika' => 'bg-orange-light text-orange',
+        'siap_diambil' => 'bg-purple-light text-purple',
+        'selesai' => 'bg-success-light text-success',
+    ];
+    $paymentColors = [
+        'belum_bayar' => 'bg-danger-light text-danger',
+        'lunas' => 'bg-success-light text-success',
+    ];
+    $nextStatusLabels = [
+        'diterima' => 'Proses Cuci',
+        'cuci' => 'Proses Setrika',
+        'setrika' => 'Siap Diambil',
+        'siap_diambil' => 'Selesai',
+    ];
+@endphp
 
-    @if (session('error'))
-        <div class="mb-4 bg-red-50 text-red-700 px-4 py-3 rounded-md">{{ session('error') }}</div>
-    @endif
+<div class="row">
+    <div class="col-12 col-lg-8">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">Informasi Order</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-3 text-muted">Kode Order</dt>
+                    <dd class="col-sm-9 fw-mono">{{ $order->order_code }}</dd>
 
-    @php
-        $statusColors = [
-            'diterima' => 'bg-blue-100 text-blue-800',
-            'cuci' => 'bg-yellow-100 text-yellow-800',
-            'setrika' => 'bg-orange-100 text-orange-800',
-            'siap_diambil' => 'bg-purple-100 text-purple-800',
-            'selesai' => 'bg-green-100 text-green-800',
-        ];
-        $paymentColors = [
-            'belum_bayar' => 'bg-red-100 text-red-800',
-            'lunas' => 'bg-green-100 text-green-800',
-        ];
-        $nextStatusLabels = [
-            'diterima' => 'Proses Cuci',
-            'cuci' => 'Proses Setrika',
-            'setrika' => 'Siap Diambil',
-            'siap_diambil' => 'Selesai',
-        ];
-    @endphp
+                    <dt class="col-sm-3 text-muted">Tanggal Masuk</dt>
+                    <dd class="col-sm-9">{{ $order->created_at->format('d/m/Y H:i') }}</dd>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {{-- Main Content --}}
-        <div class="lg:col-span-2 space-y-6">
-            {{-- Order Info --}}
-            <div class="bg-white shadow rounded-lg p-6">
-                <h2 class="text-lg font-medium text-gray-900 mb-4">Informasi Order</h2>
-                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
-                    <div>
-                        <dt class="text-gray-500">Kode Order</dt>
-                        <dd class="font-mono font-medium text-gray-900">{{ $order->order_code }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-gray-500">Tanggal Masuk</dt>
-                        <dd class="text-gray-900">{{ $order->created_at->format('d/m/Y H:i') }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-gray-500">Pelanggan</dt>
-                        <dd class="text-gray-900">{{ $order->customer->name }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-gray-500">Telepon</dt>
-                        <dd class="text-gray-900">{{ $order->customer->phone }}</dd>
-                    </div>
-                    <div class="sm:col-span-2">
-                        <dt class="text-gray-500">Alamat</dt>
-                        <dd class="text-gray-900">{{ $order->customer->address ?? '-' }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-gray-500">Staff</dt>
-                        <dd class="text-gray-900">{{ $order->user->name }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-gray-500">Estimasi Selesai</dt>
-                        <dd class="text-gray-900">{{ $order->estimated_done ? $order->estimated_done->format('d/m/Y') : '-' }}</dd>
-                    </div>
+                    <dt class="col-sm-3 text-muted">Pelanggan</dt>
+                    <dd class="col-sm-9">{{ $order->customer->name }}</dd>
+
+                    <dt class="col-sm-3 text-muted">Telepon</dt>
+                    <dd class="col-sm-9">{{ $order->customer->phone }}</dd>
+
+                    <dt class="col-sm-3 text-muted">Alamat</dt>
+                    <dd class="col-sm-9">{{ $order->customer->address ?? '-' }}</dd>
+
+                    <dt class="col-sm-3 text-muted">Staff</dt>
+                    <dd class="col-sm-9">{{ $order->user->name }}</dd>
+
+                    <dt class="col-sm-3 text-muted">Estimasi Selesai</dt>
+                    <dd class="col-sm-9">{{ $order->estimated_done ? $order->estimated_done->format('d/m/Y') : '-' }}</dd>
+
                     @if ($order->finished_at)
-                        <div>
-                            <dt class="text-gray-500">Tanggal Selesai</dt>
-                            <dd class="text-gray-900">{{ $order->finished_at->format('d/m/Y H:i') }}</dd>
-                        </div>
+                        <dt class="col-sm-3 text-muted">Tanggal Selesai</dt>
+                        <dd class="col-sm-9">{{ $order->finished_at->format('d/m/Y H:i') }}</dd>
                     @endif
                 </dl>
             </div>
-
-            {{-- Items Table --}}
-            <div class="bg-white shadow rounded-lg overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h2 class="text-lg font-medium text-gray-900">Item Pesanan</h2>
-                </div>
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Layanan</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Harga/Satuan</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Qty</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        @forelse ($order->items as $item)
-                            <tr>
-                                <td class="px-6 py-4 text-sm text-gray-900">{{ $item->service->name }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-500">
-                                    Rp {{ number_format($item->price, 0, ',', '.') }} / {{ $item->service->unit }}
-                                </td>
-                                <td class="px-6 py-4 text-sm text-gray-500">{{ $item->qty }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-900 text-right">
-                                    Rp {{ number_format($item->subtotal, 0, ',', '.') }}
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="px-6 py-12 text-center text-gray-500">Belum ada item.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                    <tfoot class="bg-gray-50">
-                        <tr>
-                            <td colspan="3" class="px-6 py-4 text-sm font-medium text-gray-900 text-right">Total</td>
-                            <td class="px-6 py-4 text-sm font-bold text-gray-900 text-right">
-                                Rp {{ number_format($order->total_price, 0, ',', '.') }}
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
         </div>
 
-        {{-- Sidebar --}}
-        <div class="space-y-6">
-            {{-- Status Card --}}
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-sm font-medium text-gray-500 uppercase mb-3">Status</h3>
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $statusColors[$order->status] ?? '' }}">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">Item Pesanan</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Layanan</th>
+                                <th>Harga/Satuan</th>
+                                <th>Qty</th>
+                                <th class="text-end">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($order->items as $item)
+                                <tr>
+                                    <td>{{ $item->service->name }}</td>
+                                    <td class="text-muted">Rp {{ number_format($item->price, 0, ',', '.') }} / {{ $item->service->unit }}</td>
+                                    <td>{{ $item->qty }}</td>
+                                    <td class="text-end fw-medium">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">Belum ada item.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <td colspan="3" class="fw-medium text-end">Total</td>
+                                <td class="text-end fw-bold">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">Status</h5>
+            </div>
+            <div class="card-body">
+                <span class="badge rounded-pill fs-6 px-3 py-2 {{ $statusColors[$order->status] ?? 'bg-secondary' }}">
                     {{ $order->getStatusLabel() }}
                 </span>
 
                 @if ($order->getNextStatus())
-                    <form method="POST" action="{{ route('orders.updateStatus', $order) }}" class="mt-4">
+                    <form method="POST" action="{{ route('orders.updateStatus', $order) }}" class="mt-3">
                         @csrf
                         @method('PATCH')
                         <input type="hidden" name="status" value="{{ $order->getNextStatus() }}">
-                        <button type="submit"
-                                class="w-full inline-flex justify-center items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-colors">
-                            {{ $nextStatusLabels[$order->getNextStatus()] ?? ucfirst(str_replace('_', ' ', $order->getNextStatus())) }}
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="ph-arrow-right me-1"></i> {{ $nextStatusLabels[$order->getNextStatus()] ?? ucfirst(str_replace('_', ' ', $order->getNextStatus())) }}
                         </button>
                     </form>
                 @endif
             </div>
+        </div>
 
-            {{-- Payment Card --}}
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-sm font-medium text-gray-500 uppercase mb-3">Pembayaran</h3>
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $paymentColors[$order->payment_status] ?? '' }}">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">Pembayaran</h5>
+            </div>
+            <div class="card-body">
+                <span class="badge rounded-pill fs-6 px-3 py-2 {{ $paymentColors[$order->payment_status] ?? 'bg-secondary' }}">
                     {{ $order->getPaymentStatusLabel() }}
                 </span>
 
                 @if ($order->payment_status === 'belum_bayar')
-                    <div class="mt-4">
-                        <a href="{{ route('orders.payment.create', $order) }}"
-                           class="w-full inline-flex justify-center items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors">
-                            Bayar
+                    <div class="mt-3 d-grid">
+                        <a href="{{ route('orders.payment.create', $order) }}" class="btn btn-danger">
+                            <i class="ph-cash me-1"></i> Bayar
                         </a>
                     </div>
                 @elseif ($order->payment)
-                    <div class="mt-4 space-y-2 text-sm">
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">Jumlah</span>
-                            <span class="text-gray-900 font-medium">Rp {{ number_format($order->payment->amount, 0, ',', '.') }}</span>
+                    <div class="mt-3 small">
+                        <div class="row">
+                            <div class="col-6 text-muted">Jumlah</div>
+                            <div class="col-6 text-end fw-medium">Rp {{ number_format($order->payment->amount, 0, ',', '.') }}</div>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">Metode</span>
-                            <span class="text-gray-900">{{ ucfirst(str_replace('_', ' ', $order->payment->method)) }}</span>
+                        <div class="row">
+                            <div class="col-6 text-muted">Metode</div>
+                            <div class="col-6 text-end">{{ ucfirst(str_replace('_', ' ', $order->payment->method)) }}</div>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">Tanggal</span>
-                            <span class="text-gray-900">{{ $order->payment->paid_at->format('d/m/Y H:i') }}</span>
+                        <div class="row">
+                            <div class="col-6 text-muted">Tanggal</div>
+                            <div class="col-6 text-end">{{ $order->payment->paid_at->format('d/m/Y H:i') }}</div>
                         </div>
                     </div>
                 @endif
             </div>
+        </div>
 
-            {{-- Actions --}}
-            <div class="bg-white shadow rounded-lg p-6 space-y-3">
-                <h3 class="text-sm font-medium text-gray-500 uppercase mb-3">Aksi</h3>
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Aksi</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    @if ($order->isEditable())
+                        <a href="{{ route('orders.editItems', $order) }}" class="btn btn-outline-secondary">
+                            <i class="ph-pencil me-1"></i> Edit Item
+                        </a>
+                    @endif
 
-                @if ($order->isEditable())
-                    <a href="{{ route('orders.editItems', $order) }}"
-                       class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors">
-                        Edit Item
+                    <a href="{{ $order->getNotaUrl() }}" target="_blank" class="btn btn-outline-primary">
+                        <i class="ph-printer me-1"></i> Cetak Nota
                     </a>
-                @endif
 
-                <a href="{{ $order->getNotaUrl() }}"
-                   target="_blank"
-                   class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors">
-                    Cetak Nota
-                </a>
+                    <a href="{{ route('orders.show', $order) }}" target="_blank" class="btn btn-outline-info">
+                        <i class="ph-share-network me-1"></i> Bagikan Nota
+                    </a>
+                </div>
             </div>
         </div>
     </div>

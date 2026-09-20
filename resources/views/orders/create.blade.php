@@ -1,95 +1,118 @@
 @extends('layouts.app')
+@section('title', 'Order Baru')
+@section('breadcrumb', 'Order Baru')
 
 @section('content')
-<div class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
-    <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">Order Baru</h1>
-        <a href="{{ route('orders.index') }}" class="text-indigo-600 hover:text-indigo-900 text-sm mt-2 inline-block">← Kembali</a>
-    </div>
-
-    @if ($errors->any())
-        <div class="mb-4 bg-red-50 text-red-700 px-4 py-3 rounded-md">
-            <ul class="list-disc list-inside">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    <form method="POST" action="{{ route('orders.store') }}" class="space-y-6">
-        @csrf
-
-        <div class="bg-white shadow rounded-lg p-6">
-            <h2 class="text-lg font-medium text-gray-900 mb-4">Informasi Pelanggan</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label for="customer_id" class="block text-sm font-medium text-gray-700 mb-1">Pelanggan *</label>
-                    <select id="customer_id" name="customer_id" required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <option value="">Pilih pelanggan</option>
-                        @foreach($customers as $customer)
-                            <option value="{{ $customer->id }}" {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
-                                {{ $customer->name }} ({{ $customer->phone }})
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label for="estimated_done" class="block text-sm font-medium text-gray-700 mb-1">Estimasi Selesai</label>
-                    <input type="date" id="estimated_done" name="estimated_done" value="{{ old('estimated_done') }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
+<div class="row">
+    <div class="col-12 col-lg-10 mx-auto">
+        @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                <ul class="list-unstyled mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-        </div>
+        @endif
 
-        <div class="bg-white shadow rounded-lg p-6">
-            <h2 class="text-lg font-medium text-gray-900 mb-4">Item Order</h2>
-            <div id="items-container" class="space-y-4">
-                <div class="item-row grid grid-cols-12 gap-4 items-end">
-                    <div class="col-span-5">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Layanan *</label>
-                        <select name="items[0][service_id]" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 service-select">
-                            <option value="">Pilih layanan</option>
-                            @foreach($services as $service)
-                                <option value="{{ $service->id }}" data-price="{{ $service->price }}" data-unit="{{ $service->unit }}">
-                                    {{ $service->name }} ({{ $service->unit === 'kg' ? 'Rp '.number_format($service->price,0,',','.') : 'Rp '.number_format($service->price,0,',','.'/item) }})
+        <form method="POST" action="{{ route('orders.store') }}">
+            @csrf
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="mb-0">Informasi Pelanggan</h5>
+                </div>
+                <div class="card-body row g-3">
+                    <div class="col-12 col-md-6">
+                        <label for="customer_id" class="form-label">Pelanggan *</label>
+                        <select id="customer_id" name="customer_id" required class="form-select">
+                            <option value="">Pilih pelanggan</option>
+                            @foreach($customers as $customer)
+                                <option value="{{ $customer->id }}" {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
+                                    {{ $customer->name }} ({{ $customer->phone }})
                                 </option>
                             @endforeach
                         </select>
+                        @error('customer_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
-                    <div class="col-span-3">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Kuantitas *</label>
-                        <input type="number" name="items[0][qty]" step="0.01" min="0.01" max="999.99" required
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 qty-input">
-                    </div>
-                    <div class="col-span-3">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Subtotal</label>
-                        <div class="px-3 py-2 bg-gray-50 rounded-md text-sm subtotal">Rp 0</div>
-                    </div>
-                    <div class="col-span-1">
-                        <button type="button" class="remove-item text-red-600 hover:text-red-900 text-sm">✕</button>
+                    <div class="col-12 col-md-6">
+                        <label for="estimated_done" class="form-label">Estimasi Selesai</label>
+                        <input type="date" id="estimated_done" name="estimated_done" value="{{ old('estimated_done') }}"
+                               class="form-control">
                     </div>
                 </div>
             </div>
-            <button type="button" id="add-item" class="mt-4 text-indigo-600 hover:text-indigo-900 text-sm font-medium">+ Tambah Item</button>
-        </div>
 
-        <div class="bg-white shadow rounded-lg p-6">
-            <div class="flex justify-between items-center">
-                <span class="text-lg font-medium text-gray-900">Total</span>
-                <span id="total-price" class="text-xl font-bold text-gray-900">Rp 0</span>
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Item Order</h5>
+                    <button type="button" id="add-item" class="btn btn-outline-primary btn-sm">
+                        <i class="ph-plus me-1"></i> Tambah Item
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="items-container" class="space-y-3">
+                        <div class="item-row row g-3 align-items-end">
+                            <div class="col-md-5">
+                                <label class="form-label">Layanan *</label>
+                                <select name="items[0][service_id]" required class="form-select service-select">
+                                    <option value="">Pilih layanan</option>
+                                    @foreach($services as $service)
+                                        <option value="{{ $service->id }}" data-price="{{ $service->price }}" data-unit="{{ $service->unit }}">
+                                            {{ $service->name }} ({{ $service->unit === 'kg' ? 'Rp '.number_format($service->price,0,',','.') : 'Rp '.number_format($service->price,0,',','.'/item) }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('items.0.service_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Kuantitas *</label>
+                                <input type="number" name="items[0][qty]" step="0.01" min="0.01" max="999.99" required
+                                       class="form-control qty-input @error('items.0.qty') is-invalid @enderror">
+                                @error('items.0.qty')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Subtotal</label>
+                                <div class="form-control-plaintext subtotal fw-medium">Rp 0</div>
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-outline-danger remove-item" style="padding: 0.375rem;">
+                                    <i class="ph-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="flex justify-end space-x-3">
-            <a href="{{ route('orders.index') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Batal</a>
-            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Simpan Order</button>
-        </div>
-    </form>
+            <div class="card mb-3">
+                <div class="card-body d-flex justify-content-end align-items-center">
+                    <span class="fs-5 fw-medium me-3">Total</span>
+                    <span id="total-price" class="fs-4 fw-bold text-primary">Rp 0</span>
+                </div>
+            </div>
+
+            <div class="d-flex justify-end gap-2">
+                <a href="{{ route('orders.index') }}" class="btn btn-light">
+                    <i class="ph-x me-1"></i> Batal
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="ph-floppy-disk me-1"></i> Simpan Order
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
+@endsection
 
+@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     let itemIndex = 1;
@@ -144,4 +167,4 @@ document.addEventListener('DOMContentLoaded', function() {
     attachEvents();
 });
 </script>
-@endsection
+@endpush

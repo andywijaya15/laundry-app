@@ -1,100 +1,138 @@
 @extends('layouts.app')
+@section('title', 'Order')
+@section('breadcrumb', 'Order')
 
 @section('content')
-<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">Order</h1>
-        <a href="{{ route('orders.create') }}"
-           class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors">
-            + Order Baru
-        </a>
-    </div>
+<div class="row">
+    <div class="col-12">
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
 
-    @if (session('success'))
-        <div class="mb-4 bg-green-50 text-green-700 px-4 py-3 rounded-md">{{ session('success') }}</div>
-    @endif
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
 
-    @if (session('error'))
-        <div class="mb-4 bg-red-50 text-red-700 px-4 py-3 rounded-md">{{ session('error') }}</div>
-    @endif
+        <div class="card mb-3">
+            <div class="card-body p-3">
+                <form method="GET" action="{{ route('orders.index') }}" class="row g-3 align-items-end">
+                    <div class="col-12 col-md-3">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari kode order atau nama..."
+                               class="form-control form-control-sm">
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <select name="status" class="form-select form-select-sm">
+                            <option value="">Semua Status</option>
+                            @foreach(\App\Models\Order::WORKFLOW as $status)
+                                <option value="{{ $status }}" {{ request('status') === $status ? 'selected' : '' }}>{{ \App\Models\Order::WORKFLOW[$status] ?? ucfirst($status) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <select name="payment_status" class="form-select form-select-sm">
+                            <option value="">Semua Pembayaran</option>
+                            <option value="belum_bayar" {{ request('payment_status') === 'belum_bayar' ? 'selected' : '' }}>Belum Bayar</option>
+                            <option value="lunas" {{ request('payment_status') === 'lunas' ? 'selected' : '' }}>Lunas</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <input type="date" name="date_from" value="{{ request('date_from') }}" placeholder="Dari"
+                               class="form-control form-control-sm">
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <input type="date" name="date_to" value="{{ request('date_to') }}" placeholder="Sampai"
+                               class="form-control form-control-sm">
+                    </div>
+                    <div class="col-12 col-md-1">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="ph-magnifying-glass me-1"></i> Filter
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-    <div class="mb-4 bg-white shadow rounded-lg p-4">
-        <form method="GET" action="{{ route('orders.index') }}" class="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari kode order atau nama..."
-                   class="px-3 py-2 border border-gray-300 rounded-md text-sm">
-            <select name="status" class="px-3 py-2 border border-gray-300 rounded-md text-sm">
-                <option value="">Semua Status</option>
-                @foreach(\App\Models\Order::WORKFLOW as $status)
-                    <option value="{{ $status }}" {{ request('status') === $status ? 'selected' : '' }}>{{ \App\Models\Order::WORKFLOW[$status] ?? ucfirst($status) }}</option>
-                @endforeach
-            </select>
-            <select name="payment_status" class="px-3 py-2 border border-gray-300 rounded-md text-sm">
-                <option value="">Semua Pembayaran</option>
-                <option value="belum_bayar" {{ request('payment_status') === 'belum_bayar' ? 'selected' : '' }}>Belum Bayar</option>
-                <option value="lunas" {{ request('payment_status') === 'lunas' ? 'selected' : '' }}>Lunas</option>
-            </select>
-            <input type="date" name="date_from" value="{{ request('date_from') }}" placeholder="Dari"
-                   class="px-3 py-2 border border-gray-300 rounded-md text-sm">
-            <input type="date" name="date_to" value="{{ request('date_to') }}" placeholder="Sampai"
-                   class="px-3 py-2 border border-gray-300 rounded-md text-sm">
-        </form>
-    </div>
-
-    <div class="bg-white shadow rounded-lg overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kode</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pelanggan</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Bayar</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                @forelse ($orders as $order)
-                    <tr>
-                        <td class="px-6 py-4 text-sm font-mono text-gray-900">{{ $order->order_code }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-500">{{ $order->customer->name }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-900">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
-                        <td class="px-6 py-4 text-sm">
-                            @php
-                                $statusColors = [
-                                    'diterima' => 'bg-blue-100 text-blue-800',
-                                    'cuci' => 'bg-yellow-100 text-yellow-800',
-                                    'setrika' => 'bg-orange-100 text-orange-800',
-                                    'siap_diambil' => 'bg-purple-100 text-purple-800',
-                                    'selesai' => 'bg-green-100 text-green-800',
-                                ];
-                            @endphp
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusColors[$order->status] ?? '' }}">
-                                {{ $order->getStatusLabel() }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-sm">
-                            @php
-                                $paymentColors = [
-                                    'belum_bayar' => 'bg-red-100 text-red-800',
-                                    'lunas' => 'bg-green-100 text-green-800',
-                                ];
-                            @endphp
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $paymentColors[$order->payment_status] ?? '' }}">
-                                {{ $order->getPaymentStatusLabel() }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-right text-sm">
-                            <a href="{{ route('orders.show', $order) }}" class="text-indigo-600 hover:text-indigo-900">Detail</a>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="px-6 py-12 text-center text-gray-500">Belum ada order.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-        {{ $orders->links() }}
+        <div class="card">
+            <div class="card-header d-flex align-items-center">
+                <h5 class="mb-0">Daftar Order</h5>
+                <a href="{{ route('orders.create') }}" class="btn btn-primary btn-sm ms-auto">
+                    <i class="ph-plus me-1"></i> Order Baru
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Kode</th>
+                                <th>Pelanggan</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Bayar</th>
+                                <th class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($orders as $order)
+                                <tr>
+                                    <td class="fw-mono">{{ $order->order_code }}</td>
+                                    <td>{{ $order->customer->name }}</td>
+                                    <td>Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
+                                    <td>
+                                        @php
+                                            $statusColors = [
+                                                'diterima' => 'bg-info-light text-info',
+                                                'cuci' => 'bg-warning-light text-warning',
+                                                'setrika' => 'bg-orange-light text-orange',
+                                                'siap_diambil' => 'bg-purple-light text-purple',
+                                                'selesai' => 'bg-success-light text-success',
+                                            ];
+                                        @endphp
+                                        <span class="badge rounded-pill {{ $statusColors[$order->status] ?? 'bg-secondary' }}">
+                                            {{ $order->getStatusLabel() }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @php
+                                            $paymentColors = [
+                                                'belum_bayar' => 'bg-danger-light text-danger',
+                                                'lunas' => 'bg-success-light text-success',
+                                            ];
+                                        @endphp
+                                        <span class="badge rounded-pill {{ $paymentColors[$order->payment_status] ?? 'bg-secondary' }}">
+                                            {{ $order->getPaymentStatusLabel() }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{{ route('orders.show', $order) }}" class="btn btn-sm btn-light">
+                                            <i class="ph-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-4">
+                                        <i class="ph-inbox ph-lg d-block mb-2"></i>
+                                        Belum ada order.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                @if($orders->hasPages())
+                    <div class="card-footer">
+                        {{ $orders->links() }}
+                    </div>
+                @endif
+            </div>
+        </div>
     </div>
 </div>
 @endsection
