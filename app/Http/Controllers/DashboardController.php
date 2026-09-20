@@ -38,8 +38,7 @@ class DashboardController extends Controller
         $recentOrders = $baseOrderQuery
             ->with(['customer', 'user'])
             ->latest()
-            ->limit(5)
-            ->get();
+            ->paginate(5);
 
         return view('dashboard.index', compact(
             'todayRevenue',
