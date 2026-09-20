@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,4 +23,15 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+// Services (Owner only)
+Route::middleware(['auth', 'role:owner'])->group(function () {
+    Route::resource('services', ServiceController::class);
+});
+
+// Customers (Owner + Staff)
+Route::middleware(['auth'])->group(function () {
+    Route::resource('customers', CustomerController::class)->except(['destroy']);
+    Route::get('customers/search', [CustomerController::class, 'search'])->name('customers.search');
+});
