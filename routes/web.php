@@ -1,8 +1,9 @@
 <?php
 
-use App\Http\Controllers\HomeController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,12 +21,17 @@ Route::get('/', function () {
 
 Auth::routes();
 
-// Default redirect after login
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
+// Dashboard
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+});
 
-Route::get('/home', [HomeController::class, 'index'])->name('home');
+// Reports (Owner only)
+Route::middleware(['auth', 'role:owner'])->group(function () {
+    Route::get('reports/daily', [ReportController::class, 'daily'])->name('reports.daily');
+    Route::get('reports/monthly', [ReportController::class, 'monthly'])->name('reports.monthly');
+    Route::get('reports/transactions', [ReportController::class, 'transactions'])->name('reports.transactions');
+});
 
 // Services (Owner only)
 Route::middleware(['auth', 'role:owner'])->group(function () {
