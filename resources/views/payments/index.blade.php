@@ -83,9 +83,14 @@
                                     </td>
                                     <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
                                     <td class="text-center">
-                                        <a href="{{ route('orders.payment.create', $order) }}" class="btn btn-sm btn-primary">
-                                            <i class="ph-coins me-1"></i> Bayar
-                                        </a>
+                                        <div class="d-flex gap-1 justify-content-center">
+                                            <a href="{{ route('orders.payment.create', $order) }}" class="btn btn-sm btn-primary" title="Bayar">
+                                                <i class="ph-coins me-1"></i> Bayar
+                                            </a>
+                                            <a href="https://wa.me/?text={{ urlencode('🧺 *NOTA LAUNDRY*%0A%0AKode: ' . $order->order_code . '%0APelanggan: ' . $order->customer->name . '%0ATotal: Rp ' . number_format($order->total_price, 0, ',', '.') . '%0AStatus: ' . $order->getPaymentStatusLabel() . '%0A%0ADetail: ' . $order->nota_url) }}" target="_blank" class="btn btn-sm btn-success" title="Bagikan Nota via WhatsApp">
+                                                <i class="ph-whatsapp-logo"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty

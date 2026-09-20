@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Payment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 
 class PaymentController extends Controller
 {
@@ -31,6 +32,15 @@ class PaymentController extends Controller
         }
 
         $orders = $query->paginate(15)->withQueryString();
+
+        $orders->getCollection()->transform(function ($order) {
+            $order->nota_url = URL::temporarySignedRoute(
+                'orders.nota',
+                now()->addDays(7),
+                ['order' => $order->id]
+            );
+            return $order;
+        });
 
         return view('payments.index', compact('orders'));
     }

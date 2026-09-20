@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 
 class OrderController extends Controller
 {
@@ -42,6 +43,15 @@ class OrderController extends Controller
         }
 
         $orders = $query->latest()->paginate(15)->withQueryString();
+
+        $orders->getCollection()->transform(function ($order) {
+            $order->nota_url = URL::temporarySignedRoute(
+                'orders.nota',
+                now()->addDays(7),
+                ['order' => $order->id]
+            );
+            return $order;
+        });
 
         return view('orders.index', compact('orders'));
     }
