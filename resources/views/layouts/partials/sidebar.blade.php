@@ -63,12 +63,12 @@
                     </a>
                 </li>
 
-                {{-- Payments - Owner & Staff --}}
+                {{-- Payments - Owner & Staff (link to orders.index since payment requires an order) --}}
                 @php
-                    $paymentsPattern = 'orders.payment*';
+                    $paymentsPattern = 'orders*';
                 @endphp
                 <li class="nav-item">
-                    <a href="{{ route('orders.payment.create') }}"
+                    <a href="{{ route('orders.index') }}"
                         class="nav-link {{ request()->routeIs($paymentsPattern) ? 'active' : '' }}">
                         <i class="ph-cash"></i>
                         <span>Pembayaran</span>
