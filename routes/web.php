@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,4 +36,17 @@ Route::middleware(['auth', 'role:owner'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::resource('customers', CustomerController::class)->except(['destroy']);
     Route::get('customers/search', [CustomerController::class, 'search'])->name('customers.search');
+});
+
+// Orders (Owner + Staff)
+Route::middleware(['auth'])->group(function () {
+    Route::resource('orders', OrderController::class)->except(['destroy']);
+    Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    Route::get('orders/{order}/edit-items', [OrderController::class, 'editItems'])->name('orders.editItems');
+    Route::put('orders/{order}/edit-items', [OrderController::class, 'updateItems'])->name('orders.updateItems');
+    Route::get('orders/{order}/nota', [OrderController::class, 'nota'])->name('orders.nota');
+
+    // Payments
+    Route::get('orders/{order}/payment', [PaymentController::class, 'create'])->name('orders.payment.create');
+    Route::post('orders/{order}/payment', [PaymentController::class, 'store'])->name('orders.payment.store');
 });
