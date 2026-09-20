@@ -36,7 +36,7 @@ class CustomerController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20|regex:/^(?:\+62|0)8[1-9][0-9]{7,10}$/',
+            'phone' => ['required', 'string', 'max:20', 'regex:#^(?:\+62|0)8[1-9][0-9]{7,10}$#'],
             'address' => 'nullable|string|max:500',
         ]);
 
@@ -59,7 +59,7 @@ class CustomerController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20|regex:/^(?:\+62|0)8[1-9][0-9]{7,10}$/',
+            'phone' => ['required', 'string', 'max:20', 'regex:#^(?:\+62|0)8[1-9][0-9]{7,10}$#'],
             'address' => 'nullable|string|max:500',
         ]);
 
