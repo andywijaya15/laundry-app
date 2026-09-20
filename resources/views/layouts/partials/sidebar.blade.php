@@ -13,59 +13,104 @@
         </div>
         <div class="sidebar-section">
             <ul class="nav nav-sidebar" data-nav-type="accordion">
-                @foreach(config('menu') as $group)
-                <li class="nav-item-header">
-                    <div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">
-                        {{ $group['header'] }}
-                    </div>
-                    <i class="ph-dots-three sidebar-resize-show"></i>
+                {{-- Dashboard - Owner & Staff --}}
+                @php
+                    $dashboardPattern = 'dashboard';
+                @endphp
+                <li class="nav-item">
+                    <a href="{{ route('dashboard') }}"
+                        class="nav-link {{ request()->routeIs($dashboardPattern) ? 'active' : '' }}">
+                        <i class="ph-house"></i>
+                        <span>Dashboard</span>
+                    </a>
                 </li>
-                @foreach($group['items'] as $item)
-                    @if(!$item['permission'] || auth()->user()->can($item['permission']))
-                    @if(isset($item['children']) && count($item['children']))
-                        @php
-                            $hasActiveChild = collect($item['children'])->contains(function($child) {
-                                $prefix = explode('.', $child['route'])[0];
-                                $pattern = str_contains($child['route'], '.') ? $prefix . '.*' : $prefix;
-                                return request()->routeIs($pattern);
-                            });
-                        @endphp
-                        <li class="nav-item nav-item-submenu {{ $hasActiveChild ? 'nav-item-expanded nav-item-open active' : '' }}">
-                            <a href="#" class="nav-link">
-                                <i class="{{ $item['icon'] }}"></i>
-                                <span>{{ $item['label'] }}</span>
-                            </a>
-                            <ul class="nav-group-sub collapse {{ $hasActiveChild ? 'show' : '' }}" {{ $hasActiveChild ? 'style=display:block' : '' }}>
-                                @foreach($item['children'] as $child)
-                                @php
-                                    $childPrefix = explode('.', $child['route'])[0];
-                                    $childPattern = str_contains($child['route'], '.') ? $childPrefix . '.*' : $childPrefix;
-                                @endphp
-                                <li class="nav-item">
-                                    <a href="{{ route($child['route']) }}"
-                                        class="nav-link {{ request()->routeIs($childPattern) ? 'active' : '' }}">
-                                        {{ $child['label'] }}
-                                    </a>
-                                </li>
-                                @endforeach
-                            </ul>
-                        </li>
-                    @else
-                        @php
-                            $itemPrefix = explode('.', $item['route'])[0];
-                            $itemPattern = str_contains($item['route'], '.') ? $itemPrefix . '.*' : $itemPrefix;
-                        @endphp
+
+                {{-- Services - Owner only --}}
+                @if(auth()->user()->isOwner())
+                @php
+                    $servicesPattern = 'services*';
+                @endphp
+                <li class="nav-item">
+                    <a href="{{ route('services.index') }}"
+                        class="nav-link {{ request()->routeIs($servicesPattern) ? 'active' : '' }}">
+                        <i class="ph-list-plus"></i>
+                        <span>Layanan</span>
+                    </a>
+                </li>
+                @endif
+
+                {{-- Customers - Owner & Staff --}}
+                @php
+                    $customersPattern = 'customers*';
+                @endphp
+                <li class="nav-item">
+                    <a href="{{ route('customers.index') }}"
+                        class="nav-link {{ request()->routeIs($customersPattern) ? 'active' : '' }}">
+                        <i class="ph-users"></i>
+                        <span>Pelanggan</span>
+                    </a>
+                </li>
+
+                {{-- Orders - Owner & Staff --}}
+                @php
+                    $ordersPattern = 'orders*';
+                @endphp
+                <li class="nav-item">
+                    <a href="{{ route('orders.index') }}"
+                        class="nav-link {{ request()->routeIs($ordersPattern) ? 'active' : '' }}">
+                        <i class="ph-shopping-cart"></i>
+                        <span>Order</span>
+                    </a>
+                </li>
+
+                {{-- Payments - Owner & Staff --}}
+                @php
+                    $paymentsPattern = 'orders.payment*';
+                @endphp
+                <li class="nav-item">
+                    <a href="{{ route('orders.payment.create') }}"
+                        class="nav-link {{ request()->routeIs($paymentsPattern) ? 'active' : '' }}">
+                        <i class="ph-cash"></i>
+                        <span>Pembayaran</span>
+                    </a>
+                </li>
+
+                {{-- Reports - Owner only (collapsible submenu) --}}
+                @if(auth()->user()->isOwner())
+                @php
+                    $reportsPattern = 'reports*';
+                    $hasActiveReport = request()->routeIs($reportsPattern);
+                @endphp
+                <li class="nav-item nav-item-submenu {{ $hasActiveReport ? 'nav-item-expanded nav-item-open active' : '' }}">
+                    <a href="#" class="nav-link">
+                        <i class="ph-file-text"></i>
+                        <span>Laporan</span>
+                    </a>
+                    <ul class="nav-group-sub collapse {{ $hasActiveReport ? 'show' : '' }}" {{ $hasActiveReport ? 'style=display:block' : '' }}>
                         <li class="nav-item">
-                            <a href="{{ route($item['route']) }}"
-                                class="nav-link {{ request()->routeIs($itemPattern) ? 'active' : '' }}">
-                                <i class="{{ $item['icon'] }}"></i>
-                                <span>{{ $item['label'] }}</span>
+                            <a href="{{ route('reports.daily') }}"
+                                class="nav-link {{ request()->routeIs('reports.daily') ? 'active' : '' }}">
+                                <i class="ph-calendar"></i>
+                                <span>Harian</span>
                             </a>
                         </li>
-                    @endif
-                    @endif
-                @endforeach
-                @endforeach
+                        <li class="nav-item">
+                            <a href="{{ route('reports.monthly') }}"
+                                class="nav-link {{ request()->routeIs('reports.monthly') ? 'active' : '' }}">
+                                <i class="ph-calendar-dots"></i>
+                                <span>Bulanan</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('reports.transactions') }}"
+                                class="nav-link {{ request()->routeIs('reports.transactions') ? 'active' : '' }}">
+                                <i class="ph-list-checks"></i>
+                                <span>Transaksi</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                @endif
             </ul>
         </div>
     </div>
