@@ -8,6 +8,33 @@ use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
+    public function index(Request $request)
+    {
+        $query = Order::with(['customer', 'user'])
+            ->forRole()
+            ->where('payment_status', 'belum_bayar')
+            ->latest();
+
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('order_code', 'like', '%'.$request->search.'%')
+                    ->orWhereHas('customer', fn($q2) => $q2->where('name', 'like', '%'.$request->search.'%'));
+            });
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        $orders = $query->paginate(15)->withQueryString();
+
+        return view('payments.index', compact('orders'));
+    }
+
     public function create(Order $order)
     {
         $order->load(['customer', 'items.service', 'payment']);

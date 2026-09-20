@@ -57,4 +57,5 @@ Route::middleware(['auth'])->group(function () {
     // Payments
     Route::get('orders/{order}/payment', [PaymentController::class, 'create'])->name('orders.payment.create');
     Route::post('orders/{order}/payment', [PaymentController::class, 'store'])->name('orders.payment.store');
+    Route::get('payments', [PaymentController::class, 'index'])->name('payments.index');
 });
