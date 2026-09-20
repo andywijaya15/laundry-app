@@ -65,12 +65,12 @@
 
                 {{-- Payments - Owner & Staff (link to orders.index since payment requires an order) --}}
                 @php
-                    $paymentsPattern = 'orders*';
+                    $paymentsPattern = 'orders.payment.create';
                 @endphp
                 <li class="nav-item">
                     <a href="{{ route('orders.index') }}"
                         class="nav-link {{ request()->routeIs($paymentsPattern) ? 'active' : '' }}">
-                        <i class="ph-cash"></i>
+                        <i class="ph-coins"></i>
                         <span>Pembayaran</span>
                     </a>
                 </li>
@@ -97,7 +97,7 @@
                         <li class="nav-item">
                             <a href="{{ route('reports.monthly') }}"
                                 class="nav-link {{ request()->routeIs('reports.monthly') ? 'active' : '' }}">
-                                <i class="ph-calendar-dots"></i>
+                                <i class="ph-calendar"></i>
                                 <span>Bulanan</span>
                             </a>
                         </li>

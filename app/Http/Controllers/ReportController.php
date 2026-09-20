@@ -38,7 +38,7 @@ class ReportController extends Controller
 
         $monthlyData = Payment::whereHas('order')
             ->whereYear('paid_at', $year)
-            ->selectRaw('MONTH(paid_at) as month, SUM(amount) as total, COUNT(*) as count')
+            ->selectRaw("CAST(strftime('%m', paid_at) AS INTEGER) as month, SUM(amount) as total, COUNT(*) as count")
             ->groupBy('month')
             ->orderBy('month', 'asc')
             ->get();
