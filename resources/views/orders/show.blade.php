@@ -19,6 +19,13 @@
             </div>
         @endif
 
+        @if (session('info'))
+            <div class="alert alert-info alert-dismissible fade show mb-3" role="alert">
+                {{ session('info') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
         <div class="d-flex justify-content-between align-items-center mb-3">
             <a href="{{ route('orders.index') }}" class="btn btn-light btn-sm">
                 <i class="ph-arrow-left me-1"></i> Kembali
@@ -40,11 +47,12 @@
         'belum_bayar' => 'bg-danger-light text-danger',
         'lunas' => 'bg-success-light text-success',
     ];
-    $nextStatusLabels = [
-        'diterima' => 'Proses Cuci',
-        'cuci' => 'Proses Setrika',
-        'setrika' => 'Siap Diambil',
-        'siap_diambil' => 'Selesai',
+    $statusIcons = [
+        'diterima' => 'ph-tray',
+        'cuci' => 'ph-drop',
+        'setrika' => 'ph-coat-hanger',
+        'siap_diambil' => 'ph-package',
+        'selesai' => 'ph-check-circle',
     ];
 @endphp
 
@@ -129,22 +137,66 @@
     <div class="col-12 col-lg-4">
         <div class="card mb-3">
             <div class="card-header">
-                <h5 class="mb-0">Status</h5>
+                <h5 class="mb-0">Status Pesanan</h5>
             </div>
             <div class="card-body">
-                <span class="badge rounded-pill fs-6 px-3 py-2 {{ $statusColors[$order->status] ?? 'bg-secondary' }}">
-                    {{ $order->getStatusLabel() }}
-                </span>
-
-                @if ($order->getNextStatus())
-                    <form method="POST" action="{{ route('orders.updateStatus', $order) }}" class="mt-3">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span class="text-muted small">Status Saat Ini:</span>
+                    <span class="badge rounded-pill fs-6 px-3 py-2 {{ $statusColors[$order->status] ?? 'bg-secondary' }}">
+                        <i class="{{ $statusIcons[$order->status] ?? 'ph-tag' }} me-1"></i>
+                        {{ $order->getStatusLabel() }}
+                    </span>
+                </div>
+                @if ($order->isFinished())
+                    <div class="alert alert-light border text-center py-3 mb-0">
+                        <i class="ph-lock-key text-success fs-3 d-block mb-1"></i>
+                        <span class="fw-semibold d-block text-dark">Order Telah Selesai</span>
+                        <small class="text-muted">
+                            @if ($order->finished_at)
+                                Selesai pada {{ $order->finished_at->format('d/m/Y H:i') }}.
+                            @endif
+                            Status order sudah final dan terkunci.
+                        </small>
+                    </div>
+                @else
+                    <form method="POST" action="{{ route('orders.updateStatus', $order) }}">
                         @csrf
                         @method('PATCH')
-                        <input type="hidden" name="status" value="{{ $order->getNextStatus() }}">
+                        <div class="mb-3">
+                            <label for="statusSelect" class="form-label text-muted small fw-semibold">Ubah Proses / Status:</label>
+                            <select name="status" id="statusSelect" class="form-select @error('status') is-invalid @enderror">
+                                @foreach(\App\Models\Order::STATUS_LABELS as $key => $label)
+                                    <option value="{{ $key }}" {{ $order->status === $key ? 'selected' : '' }}>
+                                        {{ $label }} {{ $order->status === $key ? '(Saat Ini)' : '' }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('status')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                         <button type="submit" class="btn btn-primary w-100">
-                            <i class="ph-arrow-right me-1"></i> {{ $nextStatusLabels[$order->getNextStatus()] ?? ucfirst(str_replace('_', ' ', $order->getNextStatus())) }}
+                            <i class="ph-arrows-clockwise me-1"></i> Perbarui Status
                         </button>
                     </form>
+
+                    <div class="mt-3 pt-3 border-top">
+                        <span class="text-muted d-block small mb-2">Pilih Cepat:</span>
+                        <div class="d-flex flex-wrap gap-1">
+                            @foreach(\App\Models\Order::STATUS_LABELS as $key => $label)
+                                @if($key !== $order->status)
+                                    <form method="POST" action="{{ route('orders.updateStatus', $order) }}" class="d-inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="status" value="{{ $key }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                            <i class="{{ $statusIcons[$key] ?? 'ph-arrow-right' }} me-1"></i>{{ $label }}
+                                        </button>
+                                    </form>
+                                @endif
+                            @endforeach
+                        </div>
+                    </div>
                 @endif
             </div>
         </div>

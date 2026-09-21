@@ -19,7 +19,7 @@ class PaymentController extends Controller
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('order_code', 'like', '%'.$request->search.'%')
-                    ->orWhereHas('customer', fn($q2) => $q2->where('name', 'like', '%'.$request->search.'%'));
+                    ->orWhereHas('customer', fn ($q2) => $q2->where('name', 'like', '%'.$request->search.'%'));
             });
         }
 
@@ -41,6 +41,7 @@ class PaymentController extends Controller
             );
             $order->nota_url = $notaUrl;
             $order->whatsapp_share_url = $this->generateWhatsAppShareUrl($order, $notaUrl);
+
             return $order;
         });
 
@@ -51,21 +52,22 @@ class PaymentController extends Controller
     {
         try {
             $customerName = $order->customer?->name ?? 'Pelanggan';
-            
-            $message = "NOTA LAUNDRY\n\n"
-                . "Kode: {$order->order_code}\n"
-                . "Pelanggan: {$customerName}\n"
-                . "Total: Rp " . number_format($order->total_price, 0, ',', '.') . "\n"
-                . "Status: {$order->getPaymentStatusLabel()}\n\n"
-                . "Detail: {$notaUrl}";
 
-            return 'https://wa.me/?text=' . urlencode($message);
+            $message = "NOTA LAUNDRY\n\n"
+                ."Kode: {$order->order_code}\n"
+                ."Pelanggan: {$customerName}\n"
+                .'Total: Rp '.number_format($order->total_price, 0, ',', '.')."\n"
+                ."Status: {$order->getPaymentStatusLabel()}\n\n"
+                ."Detail: {$notaUrl}";
+
+            return 'https://wa.me/?text='.urlencode($message);
         } catch (\Exception $e) {
             \Log::error('Failed to generate WhatsApp share URL', [
                 'order_id' => $order->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
-            return 'https://wa.me/?text=' . urlencode($notaUrl);
+
+            return 'https://wa.me/?text='.urlencode($notaUrl);
         }
     }
 

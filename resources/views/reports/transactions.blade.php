@@ -22,8 +22,8 @@
                         <label class="form-label">Status Order</label>
                         <select name="status" class="form-select">
                             <option value="">Semua</option>
-                            @foreach(\App\Models\Order::WORKFLOW as $status)
-                                <option value="{{ $status }}" {{ request('status') === $status ? 'selected' : '' }}>{{ \App\Models\Order::WORKFLOW[$status] ?? ucfirst($status) }}</option>
+                            @foreach(\App\Models\Order::STATUS_LABELS as $status => $label)
+                                <option value="{{ $status }}" {{ request('status') === $status ? 'selected' : '' }}>{{ $label }}</option>
                             @endforeach
                         </select>
                     </div>

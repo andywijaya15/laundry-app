@@ -22,6 +22,14 @@ class Order extends Model
         'selesai',
     ];
 
+    public const STATUS_LABELS = [
+        'diterima' => 'Diterima',
+        'cuci' => 'Proses Cuci',
+        'setrika' => 'Proses Setrika',
+        'siap_diambil' => 'Siap Diambil',
+        'selesai' => 'Selesai',
+    ];
+
     public const PAYMENT_STATUS = [
         'belum_bayar',
         'lunas',
@@ -97,21 +105,16 @@ class Order extends Model
 
     public function canTransitionTo(string $nextStatus): bool
     {
-        $expectedNext = $this->getNextStatus();
+        if ($this->isFinished()) {
+            return false;
+        }
 
-        return $expectedNext === $nextStatus;
+        return in_array($nextStatus, self::WORKFLOW, true);
     }
 
     public function getStatusLabel(): string
     {
-        return match ($this->status) {
-            'diterima' => 'Diterima',
-            'cuci' => 'Proses Cuci',
-            'setrika' => 'Proses Setrika',
-            'siap_diambil' => 'Siap Diambil',
-            'selesai' => 'Selesai',
-            default => ucfirst($this->status),
-        };
+        return self::STATUS_LABELS[$this->status] ?? ucfirst($this->status);
     }
 
     public function getPaymentStatusLabel(): string

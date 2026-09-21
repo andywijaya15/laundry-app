@@ -29,8 +29,8 @@
                     <div class="col-12 col-sm-4 col-md-2">
                         <select name="status" class="form-select form-select-sm">
                             <option value="">Semua Status</option>
-                            @foreach(\App\Models\Order::WORKFLOW as $status)
-                                <option value="{{ $status }}" {{ request('status') === $status ? 'selected' : '' }}>{{ \App\Models\Order::WORKFLOW[$status] ?? ucfirst($status) }}</option>
+                            @foreach(\App\Models\Order::STATUS_LABELS as $status => $label)
+                                <option value="{{ $status }}" {{ request('status') === $status ? 'selected' : '' }}>{{ $label }}</option>
                             @endforeach
                         </select>
                     </div>

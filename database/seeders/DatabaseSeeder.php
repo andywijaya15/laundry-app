@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,7 +17,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Seed 5 services dasar laundry
-        \Illuminate\Support\Facades\DB::table('services')->insert([
+        DB::table('services')->insert([
             ['name' => 'Cuci Kering', 'unit' => 'kg', 'price' => 5000, 'is_active' => true],
             ['name' => 'Cuci Setrika', 'unit' => 'kg', 'price' => 3000, 'is_active' => true],
             ['name' => 'Cuci Express', 'unit' => 'item', 'price' => 15000, 'is_active' => true],
